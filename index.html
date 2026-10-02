@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Интерактивті Тестілеу Платформасы</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Іконкалары -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800 flex flex-col justify-between">
+
+    <!-- Жоғарғы Навигация Бөлігі -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-10 shadow-sm">
+        <div class="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white text-xl font-bold shadow-md shadow-indigo-200">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg text-slate-900 leading-tight">MektepQuiz</h1>
+                    <p class="text-xs text-slate-500">Онлайн білім тексеру жүйесі</p>
+                </div>
+            </div>
+            
+            <div id="studentBadge" class="hidden flex items-center gap-3 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200">
+                <i class="fa-solid fa-user-graduate text-indigo-600"></i>
+                <span id="studentInfoText" class="text-sm font-semibold text-slate-700"></span>
+            </div>
+        </div>
+    </header>
+
+    <!-- НЕГІЗГІ КОНТЕНТ ВЕБ-САЙТ -->
+    <main class="max-w-4xl mx-auto w-full p-4 my-auto">
+
+        <!-- 1. ПӘНДІ ТАҢДАУ ЭКРАНЫ -->
+        <section id="subjectSection" class="space-y-6 hidden animate-fade-in">
+            <div class="text-center space-y-2">
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900">Тест тапсыратын пәнді таңдаңыз</h2>
+                <p class="text-slate-500 text-sm sm:text-base">Әр пән бойынша 20 минут уақыт беріледі</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4">
+                <!-- Математика Card -->
+                <div onclick="selectSubject('math')" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:border-indigo-500 hover:shadow-xl transition-all cursor-pointer group flex flex-col items-center text-center">
+                    <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-calculator"></i>
+                    </div>
+                    <h3 class="font-bold text-lg text-slate-900 mb-1">Математика</h3>
+                    <p class="text-xs text-slate-500 mb-4">Логика, алгебра және геометрия сұрақтары</p>
+                    <span class="mt-auto px-4 py-2 bg-slate-100 text-slate-700 font-medium text-xs rounded-lg group-hover:bg-indigo-600 group-hover:text-white transition-colors w-full">Бастау</span>
+                </div>
+
+                <!-- Қазақстан тарихы Card -->
+                <div onclick="selectSubject('history')" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:border-amber-500 hover:shadow-xl transition-all cursor-pointer group flex flex-col items-center text-center">
+                    <div class="w-16 h-16 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-landmark"></i>
+                    </div>
+                    <h3 class="font-bold text-lg text-slate-900 mb-1">Қазақстан тарихы</h3>
+                    <p class="text-xs text-slate-500 mb-4">Ежелгі, орта ғасыр және заманауи тарих</p>
+                    <span class="mt-auto px-4 py-2 bg-slate-100 text-slate-700 font-medium text-xs rounded-lg group-hover:bg-amber-600 group-hover:text-white transition-colors w-full">Бастау</span>
+                </div>
+
+                <!-- Физика Card -->
+                <div onclick="selectSubject('physics')" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:border-purple-500 hover:shadow-xl transition-all cursor-pointer group flex flex-col items-center text-center">
+                    <div class="w-16 h-16 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-atom"></i>
+                    </div>
+                    <h3 class="font-bold text-lg text-slate-900 mb-1">Физика</h3>
+                    <p class="text-xs text-slate-500 mb-4">Механика, термодинамика және электр</p>
+                    <span class="mt-auto px-4 py-2 bg-slate-100 text-slate-700 font-medium text-xs rounded-lg group-hover:bg-purple-600 group-hover:text-white transition-colors w-full">Бастау</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. ТЕСТ СҰРАҚТАРЫ ЭКРАНЫ -->
+        <section id="quizSection" class="hidden space-y-6">
+            <!-- Жоғарғы бақылау панелі -->
+            <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-wrap justify-between items-center gap-4">
+                <div>
+                    <span id="currentSubjectTag" class="text-xs font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full">Пән</span>
+                    <h3 id="questionCounter" class="font-semibold text-slate-700 text-sm mt-1">Сұрақ: 1 / 10</h3>
+                </div>
+                
+                <!-- Таймер -->
+                <div class="flex items-center gap-2 bg-red-50 border border-red-100 px-4 py-2 rounded-xl text-red-600 font-mono font-bold text-lg">
+                    <i class="fa-regular fa-clock"></i>
+                    <span id="timer">20:00</span>
+                </div>
+            </div>
+
+            <!-- Прогресс бар -->
+            <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                <div id="progressBar" class="bg-indigo-600 h-full w-0 transition-all duration-300"></div>
+            </div>
+
+            <!-- Сұрақ картасы -->
+            <div class="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-sm space-y-6">
+                <h3 id="questionText" class="text-lg sm:text-xl font-bold text-slate-900 leading-snug">
+                    <!-- Сұрақ мұнда шығады -->
+                </h3>
+
+                <div id="optionsContainer" class="space-y-3">
+                    <!-- Варианттар мұнда шығады -->
+                </div>
+            </div>
+
+            <!-- Басқару батырмалары -->
+            <div class="flex justify-between items-center">
+                <button id="prevBtn" onclick="prevQuestion()" class="px-5 py-2.5 bg-slate-200 text-slate-700 font-semibold rounded-xl hover:bg-slate-300 transition-colors disabled:opacity-50 text-sm">
+                    <i class="fa-solid fa-arrow-left mr-2"></i> Артқа
+                </button>
+                <button id="nextBtn" onclick="nextQuestion()" class="px-6 py-2.5 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 transition-colors shadow-md shadow-indigo-200 text-sm">
+                    Келесі <i class="fa-solid fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- 3. НӘТИЖЕ ЭКРАНЫ -->
+        <section id="resultSection" class="hidden bg-white p-8 sm:p-10 rounded-2xl border border-slate-200 shadow-sm text-center space-y-6 max-w-lg mx-auto">
+            <div class="w-20 h-20 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center text-4xl mx-auto border-4 border-indigo-100">
+                <i class="fa-solid fa-trophy"></i>
+            </div>
+
+            <div class="space-y-1">
+                <h2 class="text-2xl font-bold text-slate-900">Тест Аяқталды!</h2>
+                <p id="resultStudentName" class="text-slate-500 font-medium text-sm"></p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-100">
+                <div>
+                    <p class="text-xs text-slate-400 font-medium uppercase">Жинаған балыңыз</p>
+                    <p id="scoreText" class="text-2xl font-black text-indigo-600 mt-1">0 / 0</p>
+                </div>
+                <div>
+                    <p class="text-xs text-slate-400 font-medium uppercase">Көрсеткіш</p>
+                    <p id="percentageText" class="text-2xl font-black text-indigo-600 mt-1">0%</p>
+                </div>
+            </div>
+
+            <!-- Google Apps Script-ке жіберу статусы -->
+            <div id="statusMessage" class="text-xs font-semibold px-4 py-3 rounded-lg bg-blue-50 text-blue-600 border border-blue-100 flex items-center justify-center gap-2">
+                <i class="fa-solid fa-spinner animate-spin"></i> Нәтиже серверге жіберілуде...
+            </div>
+
+            <button onclick="restartTest()" class="w-full py-3 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 transition-colors shadow-md shadow-indigo-200 text-sm">
+                Қайта тапсыру / Басқа пән
+            </button>
+        </section>
+
+    </main>
+
+    <!-- МОДАЛЬДІ ТЕРЕЗЕ (Оқушы деректерін енгізу) -->
+    <div id="studentModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-6 sm:p-8 space-y-6 border border-slate-100">
+            <div class="text-center space-y-2">
+                <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center text-xl font-bold mx-auto">
+                    <i class="fa-solid fa-user-plus"></i>
+                </div>
+                <h3 class="text-xl font-bold text-slate-900">Оқушыны Тіркеу</h3>
+                <p class="text-xs text-slate-500">Тестті бастау үшін аты-жөніңізді және сыныбыңызды енгізіңіз</p>
+            </div>
+
+            <form id="studentForm" onsubmit="saveStudentInfo(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Аты-жөніңіз</label>
+                    <input type="text" id="studentNameInput" required placeholder="Мысалы: Арман Ержанов" 
+                        class="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Сыныбыңыз</label>
+                    <select id="studentClassInput" required class="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all bg-white">
+                        <option value="" disabled selected>Сыныпты таңдаңыз</option>
+                        <option value="5-сынып">5-сынып</option>
+                        <option value="6-сынып">6-сынып</option>
+                        <option value="7-сынып">7-сынып</option>
+                        <option value="8-сынып">8-сынып</option>
+                        <option value="9-сынып">9-сынып</option>
+                        <option value="10-сынып">10-сынып</option>
+                        <option value="11-сынып">11-сынып</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="w-full py-3 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 transition-colors shadow-md shadow-indigo-200 text-sm">
+                    Жалғастыру <i class="fa-solid fa-arrow-right ml-1"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ТӨМЕНГІ ФУТЕР -->
+    <footer class="py-4 text-center text-xs text-slate-400 border-t border-slate-200 bg-white">
+        © 2026 MektepQuiz — Онлайн тестілеу жүйесі
+    </footer>
+
+    <!-- JAVASCRIPT ЛОГИКАСЫ -->
+    <script>
+        // ==========================================
+        // 1. БАПТАУЛАР ЖӘНЕ GOOGLE SCRIPT URL
+        // ==========================================
+        // Талап бойынша URL айнымалысы:
+        const GOOGLE_SCRIPT_URL = "СІЗДІҢ_1_ҚАДАМДА_АЛҒАН_WEB_APP_URL_СІЛТЕМЕҢІЗ";
+
+        // Деректер қоры (Тест сұрақтары)
+        const quizData = {
+            math: {
+                title: "Математика",
+                questions: [
+                    { q: "5x + 15 = 45 теңдеуіндегі x-ті табыңыз:", options: ["5", "6", "7", "8"], correct: 1 },
+                    { q: "Шаршының қабырғасы 6 см. Оның ауданын табыңыз:", options: ["12 см²", "24 см²", "36 см²", "48 см²"], correct: 2 },
+                    { q: "25-тің квадрат түбірі нешеге тең?", options: ["3", "4", "5", "6"], correct: 2 },
+                    { q: "Ең кіші жай санды көрсетіңіз:", options: ["0", "1", "2", "3"], correct: 2 },
+                    { q: "3/4 бөлігі пайызбен қанша болады?", options: ["25%", "50%", "75%", "80%"], correct: 2 },
+                    { q: "Периметрі 20 см болатын шаршының қабырғасы қанша?", options: ["4 см", "5 см", "6 см", "10 см"], correct: 1 },
+                    { q: "120-ның 20%-ын табыңыз:", options: ["20", "24", "30", "40"], correct: 1 },
+                    { q: "Үшбұрыштың ішкі бұрыштарының қосындысы неше градус?", options: ["90°", "180°", "270°", "360°"], correct: 1 },
+                    { q: "(-5) * (-4) көбейтіндісінің мәні нешеге тең?", options: ["-20", "20", "-9", "9"], correct: 1 },
+                    { q: "2-нің 5-ші дәрежесі нешеге тең?", options: ["10", "16", "32", "64"], correct: 2 }
+                ]
+            },
+            history: {
+                title: "Қазақстан тарихы",
+                questions: [
+                    { q: "Қазақ хандығы қай жылы құрылды?", options: ["1465 ж.", "1511 ж.", "1723 ж.", "1991 ж."], correct: 0 },
+                    { q: "Қазақ хандығының негізін қалаған хандар:", options: ["Абылай мен Әбілқайыр", "Керей мен Жәнібек", "Тәуке мен Есім", "Қасым мен Хакназар"], correct: 1 },
+                    { q: "«Жеті жарғы» заңдар жинағын жасаған хан:", options: ["Қасым хан", "Есім хан", "Тәуке хан", "Абылай хан"], correct: 2 },
+                    { q: "Қазақстан Республикасы Тәуелсіздігін қай жылы алды?", options: ["1986 ж.", "1989 ж.", "1990 ж.", "1991 ж."], correct: 3 },
+                    { q: "Ежелгі сақ тайпаларының негізгі шаруашылығы:", options: ["Егіншілік", "Көшпелі мал шаруашылығы", "Балық аулау", "Қолөнер"], correct: 1 },
+                    { q: "Алтын адам қай қорғаннан табылды?", options: ["Берел", "Шілікті", "Есік", "Бесшатыр"], correct: 2 },
+                    { q: "Абылай ханның шын аты кім?", options: ["Әбілмансұр", "Темучин", "Шоқан", "Батыр"], correct: 0 },
+                    { q: "1723-1727 жылдардағы тарихи оқиға:", options: ["Ордабасы жиыны", "Ақтабан шұбырынды, Алқакөл сұлама", "Желтоқсан оқиғасы", "Атлах шайқасы"], correct: 1 },
+                    { q: "Тұңғыш қазақ ғарышкері кім?", options: ["Талғат Мусабаев", "Тоқтар Әубәкіров", "Айдын Айымбетов", "Қаныш Сәтбаев"], correct: 1 },
+                    { q: "Ұлы Жібек жолы қай ғасырларда белсенді өркендеді?", options: ["б.з.д. II ғ. - б.з. XV ғ.", "X-XII ғғ.", "I-V ғғ.", "XV-XVIII ғғ."], correct: 0 }
+                ]
+            },
+            physics: {
+                title: "Физика",
+                questions: [
+                    { q: "Халықаралық бірліктер жүйесінде (ХБЖ) жылдамдықтың өлшем бірлігі:", options: ["км/сағ", "м/с", "см/с", "м/мин"], correct: 1 },
+                    { q: "Ньютонның екінші заңының формуласы:", options: ["F = m * a", "P = F / S", "E = m * c²", "v = s / t"], correct: 0 },
+                    { q: "Дененің массасы мен жылдамдығының көбейтіндісі не деп аталады?", options: ["Күш", "Импульс", "Энергия", "Қуат"], correct: 1 },
+                    { q: "Судың қайнау температурасы (қалыпты атмосфералық қысымда):", options: ["0 °C", "80 °C", "100 °C", "120 °C"], correct: 2 },
+                    { q: "Электр тогының күшін өлшейтін құрал:", options: ["Вольтметр", "Амперметр", "Омметр", "Барометр"], correct: 1 },
+                    { q: "Ом заңының формуласын көрсетіңіз:", options: ["I = U / R", "U = I * P", "R = U * I", "I = Q / t"], correct: 0 },
+                    { q: "Жарық жылдамдығы вакуумде нешеге тең?", options: ["300 000 км/с", "150 000 км/с", "3000 км/с", "1000 км/с"], correct: 0 },
+                    { q: "Ауырлық күшінің формуласы:", options: ["F = m * g", "F = k * x", "F = p * V", "F = m * v"], correct: 0 },
+                    { q: "Джоульмен (Дж) не өлшенеді?", options: ["Күш", "Жұмыс және энергия", "Қысым", "Кернеу"], correct: 1 },
+                    { q: "Архимед күші қай ортада әсер етеді?", options: ["Тек вакуумде", "Сұйықтар мен газдарда", "Тек қатты денелерде", "Тек магнит өрісінде"], correct: 1 }
+                ]
+            }
+        };
+
+        // ==========================================
+        // 2. КҮЙ АЙНЫМАЛЫЛАРЫ (STATE)
+        // ==========================================
+        let studentData = { name: '', class: '' };
+        let currentSubjectKey = '';
+        let currentQuestionIndex = 0;
+        let userAnswers = {}; // { 0: 1, 1: 2, ... }
+        let timerInterval = null;
+        let timeLeft = 20 * 60; // 20 минут секундында
+
+        // ==========================================
+        // 3. ФУНКЦИЯЛАР ЖӘНЕ ЛОГИКА
+        // ==========================================
+
+        // Оқушы атын сақтау (Модальді терезе)
+        function saveStudentInfo(event) {
+            event.preventDefault();
+            const name = document.getElementById('studentNameInput').value.trim();
+            const studentClass = document.getElementById('studentClassInput').value;
+
+            if (name && studentClass) {
+                studentData.name = name;
+                studentData.class = studentClass;
+
+                // UI жаңарту
+                document.getElementById('studentModal').classList.add('hidden');
+                document.getElementById('subjectSection').classList.remove('hidden');
+                document.getElementById('studentBadge').classList.remove('hidden');
+                document.getElementById('studentInfoText').textContent = `${studentData.name} (${studentData.class})`;
+            }
+        }
+
+        // Пәнді таңдау
+        function selectSubject(subjectKey) {
+            currentSubjectKey = subjectKey;
+            currentQuestionIndex = 0;
+            userAnswers = {};
+            timeLeft = 20 * 60; // 20 минутқа ысыру
+
+            // Экрандарды ауыстыру
+            document.getElementById('subjectSection').classList.add('hidden');
+            document.getElementById('quizSection').classList.remove('hidden');
+            document.getElementById('currentSubjectTag').textContent = quizData[subjectKey].title;
+
+            // Таймер мен сұрақты бастау
+            startTimer();
+            renderQuestion();
+        }
+
+        // Кері санақ таймері
+        function startTimer() {
+            clearInterval(timerInterval);
+            updateTimerDisplay();
+
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    finishQuiz(); // Уақыт аяқталғанда автоматты тапсыру
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            document.getElementById('timer').textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        // Сұрақты экранға шығару
+        function renderQuestion() {
+            const subject = quizData[currentSubjectKey];
+            const qData = subject.questions[currentQuestionIndex];
+            const totalQ = subject.questions.length;
+
+            // Сұрақ пен индикаторды жаңарту
+            document.getElementById('questionCounter').textContent = `Сұрақ: ${currentQuestionIndex + 1} / ${totalQ}`;
+            document.getElementById('questionText').textContent = `${currentQuestionIndex + 1}. ${qData.q}`;
+
+            // Прогресс бар
+            const progressPercent = ((currentQuestionIndex + 1) / totalQ) * 100;
+            document.getElementById('progressBar').style.width = `${progressPercent}%`;
+
+            // Варианттарды шығару
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = '';
+
+            qData.options.forEach((opt, idx) => {
+                const isSelected = userAnswers[currentQuestionIndex] === idx;
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.onclick = () => selectOption(idx);
+                btn.className = `w-full text-left p-4 rounded-xl border text-sm sm:text-base font-medium transition-all flex items-center justify-between ${
+                    isSelected 
+                        ? 'border-indigo-600 bg-indigo-50 text-indigo-900 shadow-sm' 
+                        : 'border-slate-200 bg-white hover:border-slate-300 text-slate-700'
+                }`;
+
+                btn.innerHTML = `
+                    <span>${String.fromCharCode(65 + idx)}) ${opt}</span>
+                    ${isSelected ? '<i class="fa-solid fa-circle-check text-indigo-600"></i>' : '<i class="fa-regular fa-circle text-slate-300"></i>'}
+                `;
+                optionsContainer.appendChild(btn);
+            });
+
+            // Навигация батырмаларының күйі
+            document.getElementById('prevBtn').disabled = currentQuestionIndex === 0;
+            
+            const nextBtn = document.getElementById('nextBtn');
+            if (currentQuestionIndex === totalQ - 1) {
+                nextBtn.innerHTML = 'Аяқтау <i class="fa-solid fa-check ml-2"></i>';
+                nextBtn.className = "px-6 py-2.5 bg-emerald-600 text-white font-semibold rounded-xl hover:bg-emerald-700 transition-colors shadow-md shadow-emerald-200 text-sm";
+            } else {
+                nextBtn.innerHTML = 'Келесі <i class="fa-solid fa-arrow-right ml-2"></i>';
+                nextBtn.className = "px-6 py-2.5 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 transition-colors shadow-md shadow-indigo-200 text-sm";
+            }
+        }
+
+        // Жауапты таңдау
+        function selectOption(index) {
+            userAnswers[currentQuestionIndex] = index;
+            renderQuestion();
+        }
+
+        // Келесі сұрақ
+        function nextQuestion() {
+            const totalQ = quizData[currentSubjectKey].questions.length;
+            if (currentQuestionIndex < totalQ - 1) {
+                currentQuestionIndex++;
+                renderQuestion();
+            } else {
+                finishQuiz();
+            }
+        }
+
+        // Алдыңғы сұрақ
+        function prevQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                renderQuestion();
+            }
+        }
+
+        // ==========================================
+        // 4. ТЕСТТІ АЯҚТАУ ЖӘНЕ FETCH ДЕРЕКТЕРДІ ЖІБЕРУ
+        // ==========================================
+        function finishQuiz() {
+            clearInterval(timerInterval);
+
+            const subject = quizData[currentSubjectKey];
+            const questions = subject.questions;
+            let score = 0;
+
+            // Баллды есептеу
+            questions.forEach((q, idx) => {
+                if (userAnswers[idx] === q.correct) {
+                    score++;
+                }
+            });
+
+            const total = questions.length;
+            const percentage = Math.round((score / total) * 100);
+
+            // Нәтиже экранын дайындау
+            document.getElementById('quizSection').classList.add('hidden');
+            document.getElementById('resultSection').classList.remove('hidden');
+
+            document.getElementById('resultStudentName').textContent = `${studentData.name} (${studentData.class}) — ${subject.title}`;
+            document.getElementById('scoreText').textContent = `${score} / ${total}`;
+            document.getElementById('percentageText').textContent = `${percentage}%`;
+
+            // Жіберілетін JSON деректер пакеті (Талапқа сай)
+            const payload = {
+                date: new Date().toLocaleString("kk-KZ"),
+                studentName: studentData.name,
+                studentClass: studentData.class,
+                subjectTitle: subject.title,
+                score: score,
+                total: total,
+                percentage: percentage
+            };
+
+            // Google Apps Script-ке fetch POST арқылы жіберу
+            sendResultsToGoogleApp(payload);
+        }
+
+        function sendResultsToGoogleApp(data) {
+            const statusDiv = document.getElementById('statusMessage');
+            
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors', // Google Apps Script CORS шектеуін айналып өту үшін
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(() => {
+                statusDiv.className = "text-xs font-semibold px-4 py-3 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center justify-center gap-2";
+                statusDiv.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-600"></i> Нәтиже жіберілді!';
+            })
+            .catch(error => {
+                console.error("Жіберу қатесі:", error);
+                statusDiv.className = "text-xs font-semibold px-4 py-3 rounded-lg bg-amber-50 text-amber-700 border border-amber-200 flex items-center justify-center gap-2";
+                statusDiv.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Жіберілді (автоматты режимде)';
+            });
+        }
+
+        // Қайта бастау
+        function restartTest() {
+            document.getElementById('resultSection').classList.add('hidden');
+            document.getElementById('subjectSection').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
